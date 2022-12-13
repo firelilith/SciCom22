@@ -3,24 +3,31 @@ import numpy as np
 from typing import List, Callable
 
 
-def rk4_step(funcs, timestep, vals, constants):
-    k1 = np.zeros(shape=vals.shape)
-    k2 = np.zeros(shape=vals.shape)
-    k3 = np.zeros(shape=vals.shape)
-    k4 = np.zeros(shape=vals.shape)
+def second_order_rk4_step(ode, x_vals, y_vals, timestep, constants):
+    """Runge-Kutta-4 integration steps for a second order ODE
+    """
 
-    for i, f in enumerate(funcs):
-        print(k1)
-        k1[:, i] = f(0, vals, constants)
-        k2[:, i] = f(timestep/2, vals + timestep/2 * k1, constants)
-        k3[:, i] = f(timestep/2, vals + timestep/2 * k2, constants)
-        k4[:, i] = f(timestep, vals + timestep * k3, constants)
+    x_k1 = timestep * y_vals
+    y_k1 = timestep * ode(x_vals, y_vals, constants)
 
-    return vals + timestep*(k1 + 2*k2 + 2*k3 + k4)/6
+    x_k2 = timestep * (y_vals + y_k1/2)
+    y_k2 = timestep * ode(x_vals + x_k1/2, y_vals + y_k1/2, constants)
+
+    x_k3 = timestep * (y_vals + y_k2/2)
+    y_k3 = timestep * ode(x_vals + x_k2/2, y_vals + y_k2/2, constants)
+
+    x_k4 = timestep * (y_vals + y_k3)
+    y_k4 = timestep * ode(x_vals + x_k3, y_vals + y_k3, constants)
+
+    return (x_vals + (x_k1 + 2*x_k2 + 2*x_k3 + x_k4) / 6,
+            y_vals + (y_k1 + 2 * y_k2 + 2 * y_k3 + y_k4) / 6)
 
 
-def integrate(funcs: List[Callable], starting_vals: np.ndarray, timestep: float, time: float):
-    vals = starting_vals.copy()
+def integrate_ode2(second_order_ode,
+                   starting_x: np.ndarray,
+                   starting_xdot: np.ndarray,
+                   timestep: float, time: float, constants: np.ndarray):
+    x, x_dot = starting_x.copy(), starting_xdot.copy()
     for i in range(int(time/timestep+1)):
-        vals = rk4_step(funcs, timestep, vals)
-        yield vals
+        x, x_dot = second_order_rk4_step(second_order_ode, x, x_dot, timestep, constants)
+        yield x, x_dot
