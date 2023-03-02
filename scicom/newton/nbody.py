@@ -20,10 +20,11 @@ def _diff_eq(vals, m):
 
     # numpy black magic, sorry not sorry
     dist = vals[..., :3] - vals[..., :3].reshape((-1, 1, 3))
-    acc = (-1 * m * dist / np.sqrt(np.sum(
-            np.square(dist),
-            axis=2
-        ))
-    )
+    with np.errstate(divide="ignore", invalid="ignore"):
+        acc = (-1 * m * dist / np.sqrt(np.sum(
+                np.square(dist),
+                axis=2
+            )**3)
+        )
     out[..., 3:] = np.sum(acc[np.isfinite(acc)])
     return out
