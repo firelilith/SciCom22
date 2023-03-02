@@ -9,5 +9,5 @@ setup(
     description="relativistic and newtonian three-body-simulation",
     author="Spectre",
     packages=["pykanka"],
-    install_requires=["numpy", "scipy", "einsteinpy"]
+    install_requires=["numpy", "scipy", "einsteinpy, matplotlib, PyQt6"]
 )

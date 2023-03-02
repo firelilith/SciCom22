@@ -1,0 +1,5 @@
+
+
+# Animation
+animation.writer: ffmpeg
+animation.codec: mp4
