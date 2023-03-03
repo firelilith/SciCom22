@@ -1,9 +1,10 @@
 import numpy as np
 
 from functools import partial
-from scipy.constants import G
 
-from scicom.library import rk4_integration
+from astropy import constants
+
+from scicom.library import rk4_integration, distance_vec, distance_sca
 
 
 def nbody(pos, vel, mas, dt, time):
@@ -19,12 +20,11 @@ def _diff_eq(vals, m):
     out[..., :3] = vals[..., 3:]
 
     # numpy black magic, sorry not sorry
-    dist = vals[..., :3] - vals[..., :3].reshape((-1, 1, 3))
+    dist = distance_vec(vals[..., :3])
+
     with np.errstate(divide="ignore", invalid="ignore"):
-        acc = (-1 * m * dist / np.sqrt(np.sum(
-                np.square(dist),
-                axis=2
-            )**3)
-        )
-    out[..., 3:] = np.sum(acc[np.isfinite(acc)])
+        acc = (constants.G * m[:, None, None] * dist /
+               (distance_sca(vals[..., :3]) ** 3)[:, :, None])
+    acc[~np.isfinite(acc)] = 0
+    out[..., 3:] = np.sum(acc, axis=1)
     return out
