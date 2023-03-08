@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def rk4_step(ode, vals, dt):
+def rk4_step(ode: callable, vals: np.array, dt: float):
     """
     Time-independent RK4-integration.
     :param ode: callable, the system of ODEs to be solved

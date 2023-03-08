@@ -1,11 +1,9 @@
-from newton import nbody
+from scicom.post_newton_eih.nbody import _diff_eq
 import numpy as np
 
-import astropy.units as u
+x = np.array([[1, 0, 0, 0, 0.5, 0],
+              [-1, 0, 0, 0, -0.5, 0]])
+m = np.array([1, 1]) * 10 ** 17
 
-x = np.array([[1, 0, 0],
-              [-1, 0, 0]])
-v = np.array([[0, .5, 0],
-              [0, -.5, 0]])
+print(_diff_eq(m, x))
 
-m = np.ones(2) * 10**11
