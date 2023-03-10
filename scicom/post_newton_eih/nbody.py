@@ -45,10 +45,10 @@ def _diff_eq(m: np.array, vals: np.array):
     dist_sca = distance_sca(vals[..., :3]) * units.meter
     unit_vec = distance_unt(vals[..., :3]) * units.meter / units.meter
     v_vec = vals[..., 3:] * units.meter / units.second
-    v_prod = np.tensordot(vals[..., 3:], vals[..., 3:].T, axes=1) * units.meter ** 2 / units.second ** 2
+    v_prod = np.tensordot(vals[..., 3:], vals[..., 3:], axes=((1,), (1,))) * units.meter ** 2 / units.second ** 2
     v_sqrd = np.diagonal(v_prod)
-    nABvB = np.tensordot(unit_vec, v_vec)
-
+    # nABvB = np.tensordot(unit_vec, v_vec[:, None, :], axes=((1, 2), (1, 2)))
+    nABvB = np.sum(unit_vec * v_vec[None, :, :], axis=2)
 
     with np.errstate(divide="ignore", invalid="ignore"):
         n_acc = (constants.G * m[:, None, None] * dist_vec /
@@ -60,26 +60,28 @@ def _diff_eq(m: np.array, vals: np.array):
     acc = n_acc_sum.copy()
 
     with np.errstate(divide="ignore", invalid="ignore"):
-        nested_1 = 4 * constants.G * m[:, None] / dist_sca
-
+        nested = 4 * constants.G * m[:, None] / dist_sca
+    nested[~np.isfinite(nested)] = 0
 
     #  https://en.wikipedia.org/wiki/Einstein%E2%80%93Infeld%E2%80%93Hoffmann_equations
     with np.errstate(divide="ignore", invalid="ignore"):
         for i in range(iterations):
             new_acc = np.zeros(n_acc_sum.shape) * units.meter / units.second ** 2
 
-            first_term = (np.ones(1)[:, None, None]
+            a = 1/2 * np.tensordot(dist_vec, acc, axes=((2,), (1,)))
+            b = 1/2 * np.sum(dist_vec * acc[None, :, :], axis=2)
+
+            first_term = (np.ones(1)[:, None]
                           + 1 / constants.c ** 2 * (
-                            v_sqrd[:, None, None]
-                            + 2 * v_sqrd[None, :, None]
-                            + 4 * v_prod[:, :, None]
+                            v_sqrd[:, None]
+                            + 2 * v_sqrd[None, :]
+                            + 4 * v_prod[:, :]
                             - 3/2 * nABvB ** 2
-                            + 1/2 * np.tensordot(dist_vec, acc.T, axes=1)
-                            - np.sum(nested_1, axis=1)
-                            - constants.G * np.sum())
+                            + 1/2 * np.tensordot(dist_vec, acc, axes=((1, 2), (0, 1)))[:, None]  # this is very clearly wrong
+                            - np.sum(nested, axis=1))  # TODO: check if right axis
                           )
             first_term[~np.isfinite(first_term)] = 0
-            new_acc += np.sum(n_acc * first_term, axis=1)
+            new_acc += np.sum(n_acc * first_term[:, :, None], axis=1)
 
             second_term = (m[:, None, None] / dist_sca[:, :, None]**2
                            * ((np.sum(unit_vec * (4 * v_vec[None, :, :] - 3 * v_vec[:, None, :]), axis=2))[:, :, None]
