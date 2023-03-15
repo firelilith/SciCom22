@@ -21,9 +21,9 @@ def _diff_eq(vals, m):
 
     # numpy black magic, sorry not sorry
     dist = distance_vec(vals[..., :3])
-
+    a = m[0]
     with np.errstate(divide="ignore", invalid="ignore"):
-        acc = (constants.G * m[:, None, None] * dist /
+        acc = (constants.G.value * m[:, None, None] * dist /
                (distance_sca(vals[..., :3]) ** 3)[:, :, None])
     acc[~np.isfinite(acc)] = 0
     out[..., 3:] = np.sum(acc, axis=1)

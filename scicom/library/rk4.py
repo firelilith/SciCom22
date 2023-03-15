@@ -20,4 +20,5 @@ def rk4_step(ode: callable, vals: np.array, dt: float):
 
 def rk4_integration(ode, start_vals, dt, stop_time):
     for i in range(int(stop_time/dt)):
-        yield rk4_step(ode, start_vals, dt)
+        out = rk4_step(ode, start_vals, dt)
+        yield out

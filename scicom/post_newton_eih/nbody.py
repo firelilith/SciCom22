@@ -1,3 +1,5 @@
+import functools
+
 import astropy.units
 import numpy as np
 import logging
@@ -29,6 +31,11 @@ def nbody(pos, vel, mas, dt, time):
         logger.warning("no units given for mass. assuming kg")
     else:
         mas = mas.to(units.kg)
+
+    ode = functools.partial(_naive, mas=mas.value)
+    vals = np.concatenate((np.array(pos.value), np.array(vel.value)), axis=1)
+
+    return rk4_integration(ode, vals, dt, time)
 
 
 def _diff_eq(m: np.array, vals: np.array):
@@ -77,7 +84,7 @@ def _diff_eq(m: np.array, vals: np.array):
                             + 2 * v_sqrd[None, :]
                             + 4 * v_prod[:, :]
                             - 3/2 * nABvB ** 2
-                            + 1/2 * np.tensordot(dist_vec, acc, axes=((1, 2), (0, 1)))[:, None]  # this is very clearly wrong
+                            + 1/2 * np.tensordot(dist_vec, acc, axes=((1, 2), (0, 1)))[:, None]  # this is very clearly wrong... der bär?
                             - np.sum(nested, axis=1))  # TODO: check if right axis
                           )
             first_term[~np.isfinite(first_term)] = 0
@@ -99,4 +106,74 @@ def _diff_eq(m: np.array, vals: np.array):
 
     out[..., 3:] = acc
     return out
+
+
+def _naive(vals, mas):
+    pos = vals[..., :3]
+    vel = vals[..., 3:]
+
+    out = np.zeros(vals.shape)
+    out[:, :3] = vel
+
+    old_acc = np.zeros(pos.shape)
+
+    for i in range(5):
+
+        acc = np.zeros(pos.shape)
+        for a in range(len(mas)):
+            for b in range(len(mas)):
+                if a == b:
+                    continue
+                acc[a] += constants.G.value * mas[b] * (pos[b] - pos[a]) / np.linalg.norm(pos[b] - pos[a]) ** 3
+
+        for a in range(len(mas)):
+            for b in range(len(mas)):
+                if a == b:
+                    continue
+
+                inner_1 = 0
+
+                for c in range(len(mas)):
+                    if a == c:
+                        continue
+                    inner_1 += constants.G.value * mas[c] / np.linalg.norm(pos[c] - pos[a])
+
+                inner_2 = 0
+
+                for c in range(len(mas)):
+                    if b == c:
+                        continue
+                    inner_2 += constants.G.value * mas[c] / np.linalg.norm(pos[c] - pos[b])
+
+                acc[a] += (1 / constants.c.value ** 2 * constants.G.value * mas[b]
+                           * (pos[b] - pos[a]) / np.linalg.norm(pos[b] - pos[a]) ** 3 * (
+                            np.dot(vel[a], vel[a]) + 2 * np.dot(vel[b], vel[b]) - 4 * np.dot(vel[a], vel[b])
+                            + 3/2 * np.dot((pos[b] - pos[a]) / np.linalg.norm(pos[b] - pos[a]), vel[b]) ** 2
+                            + 1/2 * np.dot((pos[b] - pos[a]), old_acc[b])
+                            - 4 * inner_1 - inner_2))
+
+        for a in range(len(mas)):
+            for b in range(len(mas)):
+                if a == b:
+                    continue
+
+                acc[a] += (1 / constants.c.value ** 2 * constants.G.value * mas[b] / np.linalg.norm(pos[b] - pos[a]) ** 2
+                           * np.dot((pos[a] - pos[b]) / np.linalg.norm(pos[a] - pos[b]),
+                                    4 * vel[a] - 3 * vel[b])
+                           * (vel[a] - vel[b])
+                           )
+
+        for a in range(len(mas)):
+            for b in range(len(mas)):
+                if a == b:
+                    continue
+
+                acc[a] += (7 / 2 / constants.c.value ** 2 * constants.G.value * mas[b]
+                           * old_acc[b] / np.linalg.norm(pos[b] - pos[a]))
+        old_acc = acc
+
+    out[:, 3:] = old_acc
+
+    return out
+
 
