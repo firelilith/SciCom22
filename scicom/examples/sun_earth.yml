@@ -1,0 +1,17 @@
+sun:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [-1.06639033e+09, -3.97503657e+08, -1.38752727e+08]
+  velocity: [ 9.33421870e+00, -1.16818989e+01, -5.24341444e+00]
+  mass: 1.9885E30
+
+earth:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [-3.14190936e+10,  1.31662619e+11,  5.71157002e+10]
+  velocity: [-2.96336018e+04, -5.74850314e+03, -2.49189120e+03]
+  mass: 5.97E24
