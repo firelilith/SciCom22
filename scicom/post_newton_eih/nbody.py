@@ -1,41 +1,26 @@
-import functools
-
-import astropy.units
 import numpy as np
-import logging
 
 from functools import partial
 from astropy import constants, units
 
-from scicom.library import rk4_integration, distance_sca, distance_vec, distance_unt
+from scicom.library.rk4 import rk4_integration
+from scicom.library.coords import distance_vec, distance_sca
+from scicom.library.unit_helpers import unit_setup
 
+import logging
 
 logger = logging.getLogger(__name__)
 
 
-def nbody(pos, vel, mas, dt, time):
-    if not type(pos) == units.Quantity:
-        pos = pos * units.meter
-        logger.warning("no units given for position. assuming m")
-    else:
-        pos = pos.to(units.meter)
+def nbody(positions, velocities, masses, labels, dt, time):
+    x, v, m = unit_setup(positions, velocities, masses)
+    ode = partial(_naive, mas=m)
+    vals = np.concatenate((x, v), axis=1)
 
-    if not type(vel) == units.Quantity:
-        vel = vel * units.meter / units.second
-        logger.warning("no units given for velocity. assuming m/s")
-    else:
-        vel = vel.to(units.meter / units.second)
-
-    if not type(mas) == units.Quantity:
-        mas = mas * units.kg
-        logger.warning("no units given for mass. assuming kg")
-    else:
-        mas = mas.to(units.kg)
-
-    ode = functools.partial(_naive, mas=mas.value)
-    vals = np.concatenate((np.array(pos.value), np.array(vel.value)), axis=1)
-
-    return rk4_integration(ode, vals, dt, time)
+    return (rk4_integration(ode, vals, dt, time),
+            np.linspace(0, time, int(time/dt)),
+            masses,
+            labels)
 
 
 def _diff_eq(m: np.array, vals: np.array):

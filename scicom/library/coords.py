@@ -17,3 +17,7 @@ def distance_unt(pos):
         out = dist / scal[:, :, None]
     out[~np.isfinite(out)] = 0
     return out
+
+
+def barycenter(pos, mas):
+    return np.sum(pos * mas[:, None], axis=0) / np.sum(mas)

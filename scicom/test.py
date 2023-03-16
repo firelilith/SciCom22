@@ -1,15 +1,31 @@
 import newton
 import post_newton_eih
+import render.plotting
+import library.file_io as io
+from library import solar_system_reference
+from library import coords
 
-import numpy as np
-from astropy import units, constants
-from scicom.library import *
+preset = io.load_yaml_preset("/home/spectre/PycharmProjects/SciCom22/scicom/examples/sun_earth.yml")
+# preset = solar_system_reference.solar_system()
 
-m = np.array([1., 2.])*10.**6
-x = np.array([[1, 0, 0], [0, 0, 0]], dtype=float)
-v = np.array([[1, 0, 0], [-1, 0, 0]], dtype=float)
+x, v, m, names = preset
 
-vals = np.concatenate((x, v), axis=1)
+# x -= coords.barycenter(x, m)
+# v -= coords.barycenter(v, m)
 
-for newt, post_newt in zip(newton.nbody(x, v, m, 1, 100), post_newton_eih.nbody(x, v, m, 1, 100)):
-    print(np.max(newt - post_newt))
+print(coords.barycenter(x, m))
+
+newt = newton.nbody(*preset, 3600, 36000)
+post = post_newton_eih.nbody(*preset, 3600, 36000)
+
+gen1 = newt[0]
+gen2 = post[0]
+
+for g in gen1:
+    print("barycenter")
+    print(coords.barycenter(g[:, :3], m))
+    print("\\barycenter")
+
+# print([(g1 - g2) for g1, g2 in zip(gen1, gen2)])
+
+# render.plotting.compare(newt, post)
