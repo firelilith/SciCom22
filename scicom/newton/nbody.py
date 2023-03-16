@@ -11,7 +11,8 @@ def nbody(pos, vel, mas, dt, time):
     ode = partial(_diff_eq, m=mas)
     vals = np.concatenate((pos, vel), axis=-1)
 
-    return rk4_integration(ode=ode, start_vals=vals, dt=dt, stop_time=time)
+    for out in rk4_integration(ode=ode, start_vals=vals, dt=dt, stop_time=time):
+        yield out[:, :3], out[:, 3:]
 
 
 def _diff_eq(vals, m):

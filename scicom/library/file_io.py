@@ -44,27 +44,48 @@ def load_csv_preset(path: str):
             data[7] if data.shape[1] == 8 else [str(i) for i in range(data.shape[0])])
 
 
-def save_series(path: str, series: Iterable[np.array], overwrite=False):
+def save_series(path: str,
+                series: tuple[Iterable[np.ndarray], np.ndarray[float], np.ndarray[float],  np.ndarray[str]],
+                overwrite=False):
     if os.path.exists(path) and not overwrite:
         raise FileExistsError("give new file path, or set overwrite to True")
+
+    steps, masses, times, labels = series
+
     with open(path, "w") as f:
-        for arr in series:
-            f.write(_dump_2d(arr))
-            f.write("\n")
+        f.write(",".join(labels) + "\n")
+        f.write(",".join(str(m) for m in masses) + "\n")
+        f.write(",".join(str(t) for t in times) + "\n")
+        for arr in steps:
+            f.write(_dump_2d(arr) + "\n")
 
 
 def load_series(path: str):
+    def gen(file):
+        for line in file:
+            yield _load_2d(line)
     if not os.path.exists(path):
         raise FileNotFoundError
 
     with open(path) as f:
-        for line in f:
-            yield _load_2d(line)
+        labels = np.array(next(f).split(","), dtype=str)
+        masses = np.array(next(f).split(","), dtype=float)
+        times = np.array(next(f).split(","), dtype=float)
+        return gen(f), masses, times, labels
 
 
 def load_multiple(paths: list[str]):
-    for arr_list in zip(load_series(path) for path in paths):
-        yield np.concatenate(arr_list, axis=0)
+    def gen(list_of_generators):
+        for arr_list in zip(*list_of_generators):
+            yield np.concatenate(arr_list, axis=0)
+
+    gen_list, mass_list, time_list, label_list = zip(*[load_series(path) for path in paths])
+
+    masses = np.concatenate(mass_list)
+    times = np.concatenate(time_list)
+    labels = np.concatenate(label_list)
+
+    return gen(gen_list), masses, labels
 
 
 def _dump_2d(arr: np.array):
