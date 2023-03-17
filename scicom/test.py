@@ -11,20 +11,18 @@ from render.plotting import topdown, compare
 
 preset = io.load_yaml_preset("/home/spectre/PycharmProjects/SciCom22/scicom/examples/sun_earth.yml")
 bodies = solar_system_reference.solar_system_bodies # .remove("moon")
-# bodies = ["mercury"]
+bodies = ["earth", "sun", "moon"]
 preset = solar_system_reference.solar_system(bodies=bodies)
 
 x, v, m, names = preset
 
-# x -= coords.barycenter(x, m)
-# v -= coords.barycenter(v, m)
+step = 36000
+n = 1000
 
-newt = newton.nbody(*preset, 36000, 3600000)
-post = post_newton_eih.nbody(*preset, 36000, 3600000)
-ref  = solar_system_reference.get_series(bodies=bodies, dt=36000, duration=3600000)
+newt = newton.nbody(*preset, step, n*step)
+post = post_newton_eih.nbody(*preset, step, n*step)
+ref  = solar_system_reference.get_series(bodies=bodies, dt=step, duration=n*step)
 
-gen1 = newt[0]
-gen2 = post[0]
-
-# render.plotting.topdown(ref)
-animate(topdown, ref, out="out.mp4")
+compare(newt, post, show=True)
+# animate(topdown, ref, out="out.mp4")
+# animate(compare, ref, newt, out="out2.mp4")

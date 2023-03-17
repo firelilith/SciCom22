@@ -16,7 +16,7 @@ def nbody(positions, velocities, masses, labels, dt, time):
 
     return (rk4_integration(ode=ode, start_vals=vals, dt=dt, stop_time=time),
             np.linspace(0, time, int(time/dt), endpoint=False),
-            masses,
+            m,
             labels)
 
 

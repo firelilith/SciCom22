@@ -19,14 +19,14 @@ def nbody(positions, velocities, masses, labels, dt, time):
 
     return (rk4_integration(ode, vals, dt, time),
             np.linspace(0, time, int(time/dt), endpoint=False),
-            masses,
+            m,
             labels)
 
 
 def _diff_eq(m: np.array, vals: np.array):
     m = m * units.kg  # TODO: remove type annotations in _diff_eq
 
-    iterations = 5
+    max_iterations = 5
 
     out = np.zeros(vals.shape)
 
@@ -57,7 +57,7 @@ def _diff_eq(m: np.array, vals: np.array):
 
     #  https://en.wikipedia.org/wiki/Einstein%E2%80%93Infeld%E2%80%93Hoffmann_equations
     with np.errstate(divide="ignore", invalid="ignore"):
-        for i in range(iterations):
+        for i in range(max_iterations):
             new_acc = np.zeros(n_acc_sum.shape) * units.meter / units.second ** 2
 
             a = 1/2 * np.tensordot(dist_vec, acc, axes=((2,), (1,)))
@@ -75,13 +75,13 @@ def _diff_eq(m: np.array, vals: np.array):
             first_term[~np.isfinite(first_term)] = 0
             new_acc += np.sum(n_acc * first_term[:, :, None], axis=1)
 
-            second_term = (m[:, None, None] / dist_sca[:, :, None]**2
+            second_term = (m[None, :, None] / dist_sca[:, :, None]**2
                            * ((np.sum(unit_vec * (4 * v_vec[None, :, :] - 3 * v_vec[:, None, :]), axis=2))[:, :, None]
                            * (v_vec[None, :, :] - v_vec[:, None, :])))
             second_term[~np.isfinite(second_term)] = 0
             new_acc += -constants.G / constants.c**2 * np.sum(second_term, axis=1)
 
-            third_term = m[:, None, None] * acc[:, None, :] / dist_sca[:, :, None]
+            third_term = m[None, :, None] * acc[:, None, :] / dist_sca[:, :, None]
             third_term[~np.isfinite(third_term)] = 0
             new_acc += constants.G * 7 / (2 * constants.c**2) * np.sum(third_term, axis=1)
 
@@ -155,6 +155,10 @@ def _naive(vals, mas):
 
                 acc[a] += (7 / 2 / constants.c.value ** 2 * constants.G.value * mas[b]
                            * old_acc[b] / np.linalg.norm(pos[b] - pos[a]))
+
+        if np.allclose(old_acc, acc):
+            break
+
         old_acc = acc
 
     out[:, 3:] = old_acc
