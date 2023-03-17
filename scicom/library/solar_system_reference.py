@@ -55,5 +55,3 @@ def get_series(*, bodies: list, start: datetime, stop: datetime, dt: timedelta):
             [coordinates.get_body_barycentric(body, time=timestamp).xyz.to(units.m).value for body in bodies])
         yield pos * units.meter
 
-
-print(solar_system(bodies=["sun", "earth"]))

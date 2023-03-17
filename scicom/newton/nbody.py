@@ -30,14 +30,27 @@ def _diff_eq(vals, m):
     dist_sca = distance_sca(vals[..., :3])
 
     with np.errstate(divide="ignore", invalid="ignore"):
-        mG = constants.G.value * m
-        mGdist = mG[:, None, None] * dist
-        acc = mGdist / dist_sca[:, :, None] ** 3
-        # acc = (constants.G.value * m[:, None, None] * dist /
-        #        (dist_sca ** 3)[:, :, None])
-
-    print(acc)
+        acc = (constants.G.value * m[None, :, None] * dist /
+               (dist_sca ** 3)[:, :, None])
 
     acc[~np.isfinite(acc)] = 0
     out[..., 3:] = np.sum(acc, axis=1)
+    return out
+
+
+def _naive(vals, m):
+    pos = vals[..., :3]
+    vel = vals[..., 3:]
+
+    out = np.zeros(vals.shape)
+    out[:, :3] = vel
+
+    acc = np.zeros(pos.shape)
+    for a in range(len(m)):
+        for b in range(len(m)):
+            if a == b:
+                continue
+            acc[a] += constants.G.value * m[b] * (pos[b] - pos[a]) / np.linalg.norm(pos[b] - pos[a]) ** 3
+
+    out[:, 3:] = acc
     return out
