@@ -15,6 +15,8 @@ def compare(series1: tuple[Generator[np.ndarray, None, None], np.ndarray[float],
 
     gen2, t2, m2, l2 = series2
 
+    diff = t1 - t2
+
     if not np.all(l1 == l2):
         raise ValueError("object labels need to be identical for comparison")
     if not np.allclose(t1, t2):

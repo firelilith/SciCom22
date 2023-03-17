@@ -1,9 +1,13 @@
+import logging
 from datetime import datetime, timedelta
 from astropy import coordinates, time, units
+from typing import Union
 
 import numpy as np
 
 solar_system_bodies = ["sun", "mercury", "venus", "earth", "moon", "mars", "jupiter", "saturn", "uranus", "neptune"]
+
+logger = logging.getLogger(__name__)
 
 
 def solar_system(*,
@@ -33,7 +37,7 @@ def solar_system(*,
 
     pos = []
     vel = []
-    mas = np.array([masses[body] for body in bodies])
+    mas = np.array([masses[body] for body in bodies]) * units.kg
 
     for body in bodies:
         p, v = coordinates.get_body_barycentric_posvel(body, time=timestamp)
@@ -46,12 +50,45 @@ def solar_system(*,
             bodies)
 
 
-def get_series(*, bodies: list, start: datetime, stop: datetime, dt: timedelta):
-    now = start
-    while now < stop:
-        now += dt
-        timestamp = time.Time(now, format="datetime")
-        pos = np.array(
-            [coordinates.get_body_barycentric(body, time=timestamp).xyz.to(units.m).value for body in bodies])
-        yield pos * units.meter
+def get_series(*,
+               bodies: list = None,
+               start: datetime = datetime.fromisocalendar(2000, 1, 1),
+               stop: datetime = None,
+               duration: Union[float, int, timedelta] = None,
+               dt: Union[float, int, timedelta] = None):
 
+    if bodies is None:
+        bodies = solar_system_bodies
+    if dt is None:
+        dt = timedelta(days=1)
+    elif type(dt) is not timedelta:
+        dt = timedelta(seconds=dt)
+    if stop is None and duration is None:
+        stop = start + timedelta(days=10)
+    elif stop is None:
+        if type(duration) is not timedelta:
+            duration = timedelta(seconds=duration)
+        stop = start + duration
+    else:
+        logger.warning("both stop and duration are set. defaults to using stop")
+
+    def gen(bod, stt, stp, tm):
+        curr = stt
+        while curr < stp:
+            curr += tm
+            timestamp = time.Time(curr, format="datetime")
+            pos = np.array(
+                [(lambda x, v: np.concatenate((x.xyz.to(units.m).value, v.xyz.to(units.m/units.s).value)))
+                 (*coordinates.get_body_barycentric_posvel(body, time=timestamp)) for body in bod])
+            yield pos
+
+    _, _, mas, _ = solar_system(bodies=bodies, t=start)
+    times = []
+    now = start
+    now_s = 0
+    while now < stop:
+        times.append(now_s)
+        now += dt
+        now_s += dt.total_seconds()
+
+    return gen(bodies, start, stop, dt), np.array(times), mas, bodies

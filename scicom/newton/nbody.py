@@ -15,7 +15,7 @@ def nbody(positions, velocities, masses, labels, dt, time):
     vals = np.concatenate((x, v), axis=-1)
 
     return (rk4_integration(ode=ode, start_vals=vals, dt=dt, stop_time=time),
-            np.linspace(0, time, int(time/dt)),
+            np.linspace(0, time, int(time/dt), endpoint=False),
             masses,
             labels)
 
