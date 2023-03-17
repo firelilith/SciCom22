@@ -32,3 +32,35 @@ def compare(series1: tuple[Generator[np.ndarray, None, None], np.ndarray[float],
 
     plt.legend()
     plt.show()
+
+
+def topdown(series: tuple[Generator[np.ndarray, None, None], np.ndarray[float], np.ndarray[float], np.ndarray[str]],
+            show: bool = True):
+    val_gen, times, masses, labels = series
+
+    fig, ax = plt.subplots()
+    x_vals = []
+    y_vals = []
+
+    for val in val_gen:
+        x_vals.append(val[:, 0])
+        y_vals.append(val[:, 1])
+
+    x_vals = np.array(x_vals).T
+    y_vals = np.array(y_vals).T
+
+    for x, y, label in zip(x_vals, y_vals, labels):
+        ax.plot(x, y, label=label)
+
+    ax.set_prop_cycle(None)
+
+    for x, y, m in zip(x_vals, y_vals, masses):
+        s = np.log(m/np.min(masses)) + 1
+        ax.scatter(x[-1], y[-1], s=5*s)
+
+    ax.legend()
+
+    if show:
+        plt.show()
+
+    return fig, ax

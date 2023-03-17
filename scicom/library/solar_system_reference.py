@@ -91,4 +91,4 @@ def get_series(*,
         now += dt
         now_s += dt.total_seconds()
 
-    return gen(bodies, start, stop, dt), np.array(times), mas, bodies
+    return gen(bodies, start, stop, dt), np.array(times), np.array(mas.value), bodies
