@@ -1,0 +1,17 @@
+sun:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [0., 0., 0.]
+  velocity: [0., 0., 0.]
+  mass: 1.9885E30
+
+comet:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [0., 1.e+10, 0.]
+  velocity: [20000., 0., 0.]
+  mass: 2e+14

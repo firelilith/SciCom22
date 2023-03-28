@@ -25,6 +25,18 @@ def nbody(positions, velocities, masses, labels, dt, time):
             labels)
 
 
+def old_nbody(positions, velocities, masses, labels, dt, time):
+    x, v, m = unit_setup(positions, velocities, masses)
+    ode = partial(_naive, mas=masses)
+    vals = np.concatenate((x, v), axis=1)
+
+    return (rk4_integration(lambda pv: np.array(ode(pv)), vals, dt, time),
+            np.linspace(0, time, int(time/dt), endpoint=False),
+            m,
+            labels)
+
+
+
 def _diff_eq(m: np.array, vals: np.array):
     m = m * units.kg  # TODO: remove type annotations in _diff_eq
 
@@ -96,6 +108,9 @@ def _diff_eq(m: np.array, vals: np.array):
 
 
 def _naive(vals, mas):
+    if type(mas) != np.ndarray:
+        mas = np.array(mas.value)
+
     pos = vals[..., :3]
     vel = vals[..., 3:]
 

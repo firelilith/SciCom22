@@ -1,1 +1,1 @@
-from .nbody import nbody
+from .nbody import nbody, old_nbody
