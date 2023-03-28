@@ -4,7 +4,7 @@ from functools import partial
 from astropy import constants, units
 
 from scicom.library.rk4 import rk4_integration
-from scicom.library.coords import distance_vec, distance_sca
+from scicom.library.coords import distance_vec, distance_sca, distance_unt
 from scicom.library.unit_helpers import unit_setup
 
 import logging

@@ -6,11 +6,12 @@ from multiprocessing import Pool
 import logging
 
 import matplotlib.pyplot as plt
+import matplotlib.transforms
 import numpy as np
 
 from matplotlib import animation
 
-
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -24,7 +25,9 @@ def _gen_image(num, image_dir, vals, plot_func, masses, times, labels, kwargs):
     path = os.path.join(image_dir, f"{num:0>5}.png")
     if num % 10 == 0:
         logger.info(f"writing image {num}")
-    fig.savefig(path, format="png")
+    plt.xlim(ax.get_xlim())
+    plt.ylim(ax.get_ylim())
+    fig.savefig(path, format="png", dpi=800, bbox_inches="tight")
     plt.close()
 
 
@@ -47,23 +50,14 @@ def animate(plot_func: callable, *series, out: str = None, image_dir: str = None
                              labels=labels,
                              kwargs=kwargs)
 
-    with Pool(8) as pool:
+    with Pool(4) as pool:
         pool.map(func, range(1, len(vals[0])))
 
-    """ 
-        for i in range(1, len(vals[0])):
-        new_gens = [(vals[k][j] for j in range(i)) for k in range(len(vals))]
-        new_series = [(new_gens[k], times[k][:i], masses[k], labels[k]) for k in range(len(vals))]
-        fig, ax = plot_func(*new_series, show=False, **kwargs)
-
-        path = os.path.join(image_dir, f"{i:0>5}.png")
-        if i % 10 == 0:
-            logger.info(f"writing image {i}")
-        fig.savefig(path, format="png")
-        plt.close()
-    """
     logger.info(f"writing video to {out}")
-    os.system(f"ffmpeg -y -v 5 -framerate 20 -pattern_type glob -i '{image_dir}/*.png' -c:v libx264 -pix_fmt yuv420p {out}")
+    os.system(f"ffmpeg -y -v 3 -framerate 30 -pattern_type glob -i '{image_dir}/*.png' -s 1200x1200 {out}")
 
+
+"""
     for file in os.listdir(tmp_dir):
         os.remove(os.path.join(tmp_dir, file))
+"""

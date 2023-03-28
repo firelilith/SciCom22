@@ -61,17 +61,21 @@ def save_series(path: str,
 
 
 def load_series(path: str):
-    def gen(file):
-        for line in file:
-            yield _load_2d(line)
+    def gen(p):
+        with open(p) as file:
+            file.readline()
+            file.readline()
+            file.readline()
+            for line in file:
+                yield _load_2d(line)
     if not os.path.exists(path):
         raise FileNotFoundError
 
     with open(path) as f:
-        labels = np.array(next(f).split(","), dtype=str)
-        masses = np.array(next(f).split(","), dtype=float)
-        times = np.array(next(f).split(","), dtype=float)
-        return gen(f), masses, times, labels
+        labels = np.array(next(f).strip().split(","), dtype=str)
+        masses = np.array(next(f).strip().split(","), dtype=float)
+        times = np.array(next(f).strip().split(","), dtype=float)
+        return gen(path), masses, times, labels
 
 
 def load_multiple(paths: list[str]):
@@ -89,7 +93,7 @@ def load_multiple(paths: list[str]):
 
 
 def _dump_2d(arr: np.array):
-    return ";".join(",".join(i for i in j) for j in arr)
+    return ";".join(",".join(str(i) for i in j) for j in arr)
 
 
 def _load_2d(arr: str):
