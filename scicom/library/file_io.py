@@ -1,3 +1,4 @@
+import logging
 import os
 
 import yaml
@@ -6,6 +7,9 @@ import numpy as np
 
 from astropy import units
 from typing import Iterable
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_yaml_preset(path: str):
@@ -56,7 +60,9 @@ def save_series(path: str,
         f.write(",".join(labels) + "\n")
         f.write(",".join(str(m) for m in masses) + "\n")
         f.write(",".join(str(t) for t in times) + "\n")
-        for arr in steps:
+        for i, arr in enumerate(steps):
+            if i % 50 == 0:
+                logger.info(f"wrote step {i} to {path}")
             f.write(_dump_2d(arr) + "\n")
 
 

@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 def solar_system(*,
                  bodies=None,
-                 t=datetime.fromisocalendar(2000, 1, 1)):
+                 t=datetime.fromisocalendar(2000, 1, 1),
+                 trust_v=False):
 
     timestamp = time.Time(t, format="datetime")
 
@@ -42,7 +43,12 @@ def solar_system(*,
     for body in bodies:
         p, v = coordinates.get_body_barycentric_posvel(body, time=timestamp)
         pos.append(p.xyz.to(units.meter))
-        vel.append(v.xyz.to(units.meter/units.second))
+        if trust_v:
+            vel.append(v.xyz.to(units.meter/units.second))
+        else:
+            pp1h = coordinates.get_body_barycentric(body, time=timestamp+timedelta(seconds=3600))
+            real_v = (pp1h.xyz.to(units.meter) - p.xyz.to(units.meter)) / 3600 / units.second
+            vel.append(real_v)
 
     return (np.array(pos) * units.meter,
             np.array(vel) * units.meter/units.second,

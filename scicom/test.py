@@ -33,7 +33,11 @@ ref  = solar_system_reference.get_series(bodies=bodies, dt=step, duration=n*step
 n1 = file_io.load_series("series/newt36000.csv")
 n2 = file_io.load_series("series/ref36000.csv")
 
-compare(n1, n2, show=True)
+# compare(n1, n2, show=True)
+
+file_io.save_series("series/test.csv", post, overwrite=True)
+
+
 
 #topdown_cmp(series1=n1, series1_name="36000",
 #            series2=n2, series2_name="ref",

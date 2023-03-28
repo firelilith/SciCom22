@@ -9,15 +9,17 @@ from scicom.library.unit_helpers import unit_setup
 
 import logging
 
+import rustlib
+
 logger = logging.getLogger(__name__)
 
 
 def nbody(positions, velocities, masses, labels, dt, time):
     x, v, m = unit_setup(positions, velocities, masses)
-    ode = partial(_naive, mas=m)
+    ode = partial(rustlib.post_newt_diff_eq, mass=m, c=constants.c.value, g=constants.G.value, max_iter=5)
     vals = np.concatenate((x, v), axis=1)
 
-    return (rk4_integration(ode, vals, dt, time),
+    return (rk4_integration(lambda pv: np.array(ode(pv)), vals, dt, time),
             np.linspace(0, time, int(time/dt), endpoint=False),
             m,
             labels)
