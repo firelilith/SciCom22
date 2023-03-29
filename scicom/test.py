@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import newton
 from post_newton_eih.nbody import _naive
@@ -8,18 +9,11 @@ from library import coords, file_io
 from render.renderlib import animate
 from render.plotting import *
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-from astropy import constants
-import numpy as np
-import rustlib
+preset = file_io.load_yaml_preset("examples/sun_comet.yml")
 
-from library import file_io
+series = newton.adaptive_nbody(*preset, 1000, 150000000, 10000000)
 
-pos_vel = np.array(([0, 0, 0, 0, 0, 0], [1, 0, 0, 1E20, 0, 0]))
-m = np.array([1, 1]) * 1E20
-
-print(constants.G.value)
-print(constants.c.value)
-
-print(_naive(pos_vel, m))
-print(np.array(rustlib.post_newt_diff_eq(pos_vel, constants.G.value, constants.c.value, m, 5)))
+topdown(series, show=True, radius=None)

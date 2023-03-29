@@ -4,7 +4,7 @@ from functools import partial
 
 from astropy import constants
 
-from scicom.library.rk4 import rk4_integration
+from scicom.library.rk4 import rk4_integration, rkf45_integration
 from scicom.library.coords import distance_vec, distance_sca
 from scicom.library.unit_helpers import unit_setup
 
@@ -20,8 +20,18 @@ def nbody(positions, velocities, masses, labels, dt, time):
             labels)
 
 
+def adaptive_nbody(positions, velocities, masses, labels, dt, time, tolerance, **kwargs):
+    x, v, m = unit_setup(positions, velocities, masses)
+    ode = partial(_diff_eq, m=m)
+    vals = np.concatenate((x, v), axis=-1)
+
+    return (*zip(*rkf45_integration(ode, vals, dt, time, tolerance, **kwargs)),
+            m,
+            labels)
+
+
 def _diff_eq(vals, m):
-    """Newtonian acceleration: a = Gmr/|r|^3 """  # TODO: somthing is going wrong here, barycenter isn't preserved
+    """Newtonian acceleration: a = Gmr/|r|^3 """
     out = np.zeros(vals.shape)
     out[..., :3] = vals[..., 3:]
 
@@ -37,20 +47,3 @@ def _diff_eq(vals, m):
     out[..., 3:] = np.sum(acc, axis=1)
     return out
 
-
-def _naive(vals, m):
-    pos = vals[..., :3]
-    vel = vals[..., 3:]
-
-    out = np.zeros(vals.shape)
-    out[:, :3] = vel
-
-    acc = np.zeros(pos.shape)
-    for a in range(len(m)):
-        for b in range(len(m)):
-            if a == b:
-                continue
-            acc[a] += constants.G.value * m[b] * (pos[b] - pos[a]) / np.linalg.norm(pos[b] - pos[a]) ** 3
-
-    out[:, 3:] = acc
-    return out

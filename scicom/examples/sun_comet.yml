@@ -12,6 +12,6 @@ comet:
     mass: kg
     position: meter
     time: second
-  position: [0., 1.e+10, 0.]
-  velocity: [20000., 0., 0.]
+  position: [0., 1.e+12, 0.]
+  velocity: [200., 0., 0.]
   mass: 2e+14
