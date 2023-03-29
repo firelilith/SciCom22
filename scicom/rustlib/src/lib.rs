@@ -66,9 +66,10 @@ fn post_newt_diff_eq(pos_vel: Vec<Vec<f64>>, g: f64, c: f64, mass: Vec<f64>, max
                             + dist[2] * out[b][5])
                         )
                         );
-                    acc[a][coordinate] += 1.0 / c.powi(2) * g * mass[b] / rad.powi(3)
-                        * dist[coordinate]
-                        * (4.0 * pos_vel[a][coordinate + 3] - 3.0 * pos_vel[b][coordinate + 3])
+                    acc[a][coordinate] -= 1.0 / c.powi(2) * g * mass[b] / rad.powi(3)
+                        * (dist[0] * (4.0 * pos_vel[a][3] - 3.0 * pos_vel[b][3])
+                            + dist[1] * (4.0 * pos_vel[a][4] - 3.0 * pos_vel[b][4])
+                            + dist[2] * (4.0 * pos_vel[a][5] - 3.0 * pos_vel[b][5]))
                         * (pos_vel[a][coordinate + 3] - pos_vel[b][coordinate + 3]);
                     acc[a][coordinate] += 3.5 / c.powi(2) * g * mass[b] / rad * out[b][coordinate + 3];
                 }
