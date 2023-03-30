@@ -1,1 +1,1 @@
-from .nbody import nbody, old_nbody
+from .nbody import nbody, old_nbody, adaptive_nbody

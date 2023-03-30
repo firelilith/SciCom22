@@ -1,11 +1,11 @@
-sun:
+black_hole_10m☉:
   units:
     mass: kg
     position: meter
     time: second
   position: [0., 0., 0.]
   velocity: [0., 0., 0.]
-  mass: 1.9885E30
+  mass: 1.E34
 
 comet:
   units:
@@ -13,5 +13,5 @@ comet:
     position: meter
     time: second
   position: [0., 1.e+12, 0.]
-  velocity: [2000., 0., 0.]
+  velocity: [20000., 0., 0.]
   mass: 2e+14

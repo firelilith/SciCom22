@@ -29,15 +29,26 @@ def rk4_integration(ode, start_vals, dt, stop_time):
 def rkf45_integration(ode, vals, dt, stop_time, tolerance, **kwargs):
     t = 0
     next_log = 0
+    min_dt = np.inf
+    max_dt = 0
+
     while t < stop_time:
         if next_log == 0:
             logger.info(f"{t=:.2f}, {t/stop_time:.2%} done")
             next_log = 1000
         next_log -= 1
+
         if (stop_time-t) < dt:
             dt = stop_time - t
         t, dt = rkf45_step(ode, vals, t, dt, tolerance, **kwargs)
         yield vals.copy(), t
+
+        if dt < min_dt:
+            min_dt = dt
+        elif dt > max_dt:
+            max_dt = dt
+
+    logger.info(f"finished integration, {min_dt=:.2f}, {max_dt=:.2f}")
 
 
 # https://link.springer.com/article/10.1007/BF02234758
