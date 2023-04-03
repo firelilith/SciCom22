@@ -5,7 +5,8 @@ build-backend = "maturin"
 [project]
 name = "scicom"
 version = "1.0.0"
-authors = ["Sophia D.", "Ole B."]
+authors = [{name = "Sophia D.", email = ""},
+           {name = "Ole B.", email = ""}]
 description = "simulating the n-body problem for fun and profit"
 homepage = "https://github.com/thatGuySpectre/SciCom22"
 readme = "README.md"
