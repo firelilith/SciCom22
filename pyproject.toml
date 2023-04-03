@@ -2,24 +2,13 @@
 requires = ["maturin", "poetry"]
 build-backend = "maturin"
 
-[tool.poetry]
+[project]
 name = "scicom"
 version = "1.0.0"
 authors = ["Sophia D.", "Ole B."]
 description = "simulating the n-body problem for fun and profit"
 homepage = "https://github.com/thatGuySpectre/SciCom22"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-astropy = "^5.2"
-matplotlib = "^3.6.2"
-numpy = "^1.23.5"
-PyYAML = "^6.0"
-
-[tool.flit.metadata]
-module = "scicom"
-include = ["examples/*", "styles/*", "series/"]
 
 [tool.maturin]
 crate-directory = "scicom/rustlib"
