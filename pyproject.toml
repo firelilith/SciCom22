@@ -1,5 +1,10 @@
 [build-system]
-requires = ["maturin", "poetry"]
+requires = ["maturin", "poetry", "setuptools"]
+
+[project]
+name = "scicom"
+homepage = "https://github.com/thatGuySpectre/SciCom22"
+readme = "README.md"
 
 [tool.poetry]
 name = "scicom"
