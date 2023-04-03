@@ -23,5 +23,5 @@ include = ["examples/*", "styles/*", "series/"]
 
 [tool.maturin]
 crate-directory = "scicom/rustlib"
-cargo.toml = "scivom/rustlib/Cargo.toml"
+cargo.toml = "scicom/rustlib/Cargo.toml"
 build-args = ["--release"]
