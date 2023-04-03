@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 bodies = solar_system_reference.solar_system_bodies
 
 preset = solar_system_reference.solar_system(bodies=bodies, trust_v=False)
-preset = file_io.load_yaml_preset("examples/black_hole_comet.yml")
+# preset = file_io.load_yaml_preset("examples/black_hole_comet.yml")
 
 t = 5000000
 

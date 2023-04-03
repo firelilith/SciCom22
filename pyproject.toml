@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build-meta"
+
+[tool.poetry]
+name = "scicom"
+homepage = "https://github.com/thatGuySpectre/SciCom22"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+astropy = "^5.2"
+matplotlib = "^3.6.2"
+numpy = "^1.23.5"
+PyYAML = "^6.0"
+
+[tool.flit.metadata]
+module = "scicom"
+include = ["examples/*", "styles/*", "series/"]
+
+[tool.maturin]
+crate-directory = "scicom/rustlib"
+build-args = ["--release"]
+
+
