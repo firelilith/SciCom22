@@ -5,8 +5,7 @@ build-backend = "maturin"
 [tool.poetry]
 name = "scicom"
 version = "1.0.0"
-authors = [{name = "Sophia D.", email = ""},
-           {name = "Ole B.", email = ""}]
+authors = ["Sophia D.", "Ole B."]
 description = "simulating the n-body problem for fun and profit"
 homepage = "https://github.com/thatGuySpectre/SciCom22"
 readme = "README.md"
