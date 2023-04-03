@@ -1,6 +1,5 @@
 [build-system]
 requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build-meta"
 
 [tool.poetry]
 name = "scicom"
@@ -22,4 +21,7 @@ include = ["examples/*", "styles/*", "series/"]
 crate-directory = "scicom/rustlib"
 build-args = ["--release"]
 
+[tool.setuptools]
+python_requires = ">=3.9"
+setuptools_version = ">=58.0.4"
 
