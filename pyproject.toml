@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "poetry"]
+requires = ["maturin", "poetry"]
 
 [tool.poetry]
 name = "scicom"
