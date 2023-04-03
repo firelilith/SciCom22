@@ -1,13 +1,10 @@
 [build-system]
-requires = ["maturin", "poetry", "setuptools"]
-
-[project]
-name = "scicom"
-homepage = "https://github.com/thatGuySpectre/SciCom22"
-readme = "README.md"
+requires = ["maturin", "poetry"]
 
 [tool.poetry]
 name = "scicom"
+version = "1.0.0"
+authors = ["Sophia D.", "Ole B."]
 homepage = "https://github.com/thatGuySpectre/SciCom22"
 readme = "README.md"
 
@@ -25,8 +22,3 @@ include = ["examples/*", "styles/*", "series/"]
 [tool.maturin]
 crate-directory = "scicom/rustlib"
 build-args = ["--release"]
-
-[tool.setuptools]
-python_requires = ">=3.9"
-setuptools_version = ">=58.0.4"
-
