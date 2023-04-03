@@ -1,10 +1,40 @@
+# Dependencies
+
+To run this project, a current version of Python 3 as well as Rustlang are needed. For instructions, see 
+
+https://wiki.python.org/moin/BeginnersGuide/Download  
+https://www.rust-lang.org/tools/install
+
+# Install
+
+To install, first clone this repository and cd into it:
+
+```bash
+git clone git+https://github.com/thatGuySpectre/SciCom22
+cd SciCom22
+```
+
+It is recommended to use a virtual python environment:
+
+```bash
+pip install venv
+python3 -m venv venv/
+source venv/bin/activate
+```
+
+Then install poetry, to install dependencies
+
+```bash
+pip install poetry
+poetry install
+pip install .
+```
+
+You can now import the module `scicom` in python files within the venv, or call default examples using `python3 -m scicom`
+
+# Usage
+
+
 This module provides several ways to simulate gravitational interactions, as well as visualisation options. 
 
-To start a simulation, you need to provide starting conditions in a CSV file. Every line represents an object, the first value is its mass, the second to fourth is its (barycentric) position in (arbitrary) cartesian coordinates, and the fifth to seventh its velocity.
-
-An example:
-
-```
-1, 0, 5, 0, 1, 0, 0
-10, 0, 0, 0, 0, 0, 0
-```
+To start a simulation, you need to provide starting conditions in a YAML file. Several examples are provided in `scicom/presets`.
