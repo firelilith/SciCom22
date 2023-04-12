@@ -20,7 +20,7 @@ bodies = solar_system_reference.solar_system_bodies
 preset = solar_system_reference.solar_system(bodies=bodies, trust_v=False)
 # preset = file_io.load_yaml_preset("examples/black_hole_comet.yml")
 
-t = 250 * 365 * 24 * 3600 / 10000
+t = 500 * 365 * 24 * 3600
 tolerance = 10000000
 
 series1 = newton.adaptive_nbody(*preset, dt=1000, time=t, tolerance=tolerance)
