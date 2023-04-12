@@ -7,6 +7,7 @@ from astropy import constants
 from scicom.library.rk4 import rk4_integration, rkf45_integration
 from scicom.library.coords import distance_vec, distance_sca
 from scicom.library.unit_helpers import unit_setup
+from scicom.library.iterhelp import split_generator
 
 
 def nbody(positions, velocities, masses, labels, dt, time):
@@ -25,7 +26,12 @@ def adaptive_nbody(positions, velocities, masses, labels, dt, time, tolerance, *
     ode = partial(_diff_eq, m=m)
     vals = np.concatenate((x, v), axis=-1)
 
-    return (*zip(*rkf45_integration(ode, vals, dt, time, tolerance, **kwargs)),
+    integration = rkf45_integration(ode, vals, dt, time, tolerance, **kwargs)
+
+    locations, times = split_generator(integration)
+
+    return (locations,
+            times,
             m,
             labels)
 

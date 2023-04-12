@@ -8,6 +8,8 @@ import numpy as np
 from astropy import units
 from typing import Iterable
 
+from scicom.library.iterhelp import split_generator
+
 
 logger = logging.getLogger(__name__)
 
@@ -54,16 +56,16 @@ def save_series(path: str,
     if os.path.exists(path) and not overwrite:
         raise FileExistsError("give new file path, or set overwrite to True")
 
-    steps, masses, times, labels = series
+    steps, times, masses, labels = series
+
 
     with open(path, "w") as f:
         f.write(",".join(labels) + "\n")
         f.write(",".join(str(m) for m in masses) + "\n")
-        f.write(",".join(str(t) for t in times) + "\n")
-        for i, arr in enumerate(steps):
-            if i % 50 == 0:
-                logger.info(f"wrote step {i} to {path}")
-            f.write(_dump_2d(arr) + "\n")
+        for i, (t, arr) in enumerate(zip(times, steps)):
+            if i % 100 == 0:
+                logger.debug(f"wrote step {i} to {path}")
+            f.write(f"{t}:{_dump_2d(arr)}\n")
 
 
 def load_series(path: str):
@@ -71,17 +73,19 @@ def load_series(path: str):
         with open(p) as file:
             file.readline()
             file.readline()
-            file.readline()
             for line in file:
-                yield _load_2d(line)
+                t, rest = line.split(":")
+                t = float(t)
+                arr = _load_2d(rest)
+                yield t, arr
     if not os.path.exists(path):
         raise FileNotFoundError
 
     with open(path) as f:
         labels = np.array(next(f).strip().split(","), dtype=str)
         masses = np.array(next(f).strip().split(","), dtype=float)
-        times = np.array(next(f).strip().split(","), dtype=float)
-        return gen(path), masses, times, labels
+    times, steps = split_generator(gen(path))
+    return steps, masses, times, labels
 
 
 def load_multiple(paths: list[str]):
