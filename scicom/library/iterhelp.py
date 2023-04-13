@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 def split_generator(gen_that_yields_2):
     cache_1 = []
     cache_2 = []
@@ -38,8 +42,9 @@ def sparsify(series, timestep):
         last_time = 0
 
         for s, t in vals:
-            if t - last_time > dt:
-                last_time = t
+            if t - last_time >= dt:
+                logger.info(f"passed time {last_time}, writing")
+                last_time += dt
                 yield s, t
 
     return *split_generator(gen(steps, times, timestep)), masses, labels
