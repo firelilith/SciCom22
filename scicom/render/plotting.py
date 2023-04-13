@@ -10,7 +10,7 @@ from typing import Generator
 def compare(series1: tuple[Generator[np.ndarray, None, None], np.ndarray[float], np.ndarray[float], np.ndarray[str]],
             series2: tuple[Generator[np.ndarray, None, None], np.ndarray[float], np.ndarray[float], np.ndarray[str]],
             *,
-            show=False,
+            show=True,
             strict=True):
 
     gen1, t1, m1, l1 = series1
@@ -19,13 +19,15 @@ def compare(series1: tuple[Generator[np.ndarray, None, None], np.ndarray[float],
 
     if not np.all(l1 == l2):
         raise ValueError("object labels need to be identical for comparison")
-    if not np.allclose(t1, t2):
-        raise ValueError("times must be identical for comparison")
+    # if not np.allclose(t1, t2, atol=1000):
+    #     raise ValueError("times must be identical for comparison")
     if strict and not np.allclose(m1, m2):
         raise ValueError("strict mode enabled. masses need to be identical")
 
     fig, ax = plt.subplots()
     delta = np.array([np.linalg.norm((x1 - x2)[:, :3], axis=1) for x1, x2 in zip(gen1, gen2)]).T
+
+    t1 = list(t1)
 
     for val, name in zip(delta, l1):
         ax.plot(t1, val, label=name)
@@ -139,7 +141,7 @@ def topdown_cmp(series1: tuple[
     ax.set_prop_cycle(None)
 
     for x, y, m in zip(x_vals2, y_vals2, m2):
-        s = np.log(m / np.min(m2)) + 1
+        s = np.log(max(m, 1) / max(np.min(m2), 1)) + 1
         ax.scatter(x[-1], y[-1], s=2 * s)
 
     max_lim1 = max(np.max(np.abs(x_vals1)), np.max(np.abs(y_vals1))) * 1.1

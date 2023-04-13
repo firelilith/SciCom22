@@ -1,0 +1,35 @@
+black_hole_10m☉:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [0., 0., 0.]
+  velocity: [0., 0., 0.]
+  mass: 1.E34
+
+at_1.0_isco:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [ 44556961.61471199, 0., 0. ] # calculated as 6 * GM/c^2
+  velocity: [ 0., 122389758.47245945, 0. ] # calculated as sqrt(GM/(r - 2GM/c^2))
+  mass: 1
+
+at_0.8_isco:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [ 35645569.291769594, 0., 0. ]
+  velocity: [ 0., 136835909.84710008, 0. ]
+  mass: 1
+
+at_1.2_isco:
+  units:
+    mass: kg
+    position: meter
+    time: second
+  position: [ 53468353.93765439, 0., 0. ]
+  velocity: [ 0., 111726052.53829177, 0. ]
+  mass: 1

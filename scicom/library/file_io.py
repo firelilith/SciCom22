@@ -27,9 +27,9 @@ def load_yaml_preset(path: str):
         space_unit = units.Unit(data[key]["units"]["position"])
         time_unit = units.Unit(data[key]["units"]["time"])
         mass_unit = units.Unit(data[key]["units"]["mass"])
-        positions.append((data[key]["position"] * space_unit).to(units.m).value)
-        velocities.append((data[key]["velocity"] * space_unit/time_unit).to(units.m/units.s).value)
-        masses.append((data[key]["mass"] * mass_unit).to(units.kg))
+        positions.append(units.Quantity(np.array(data[key]["position"]), space_unit).to(units.m).value)
+        velocities.append(units.Quantity(np.array(data[key]["velocity"]), space_unit/time_unit).to(units.m/units.s).value)
+        masses.append(units.Quantity(data[key]["mass"], mass_unit).to(units.kg).value)
         labels.append(key)
 
     return (np.array(positions) * units.meter,
