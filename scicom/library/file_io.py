@@ -85,7 +85,7 @@ def load_series(path: str):
         labels = np.array(next(f).strip().split(","), dtype=str)
         masses = np.array(next(f).strip().split(","), dtype=float)
     times, steps = split_generator(gen(path))
-    return steps, masses, times, labels
+    return steps, times, masses, labels
 
 
 def load_multiple(paths: list[str]):

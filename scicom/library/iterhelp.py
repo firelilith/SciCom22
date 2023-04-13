@@ -28,3 +28,18 @@ def split_generator(gen_that_yields_2):
 
     return gen1(gen_that_yields_2), gen2(gen_that_yields_2)
 
+
+def sparsify(series, timestep):
+    steps, times, masses, labels = series
+
+    def gen(st, ti, dt):
+        vals = zip(st, ti)
+
+        last_time = 0
+
+        for s, t in vals:
+            if t - last_time > dt:
+                last_time = t
+                yield s, t
+
+    return *split_generator(gen(steps, times, timestep)), masses, labels
