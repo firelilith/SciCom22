@@ -67,3 +67,12 @@ def tail(series, n):
         out_times.pop(0)
 
     return (i for i in out_steps), (i for i in out_times), masses, labels
+
+
+def head(series, n):
+    steps, times, masses, labels = series
+
+    return ((val for val, i in list(zip(steps, range(n)))),
+            (t for t, i in list(zip(times, range(n)))),
+            masses,
+            labels)

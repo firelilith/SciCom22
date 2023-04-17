@@ -1,6 +1,6 @@
 # Dependencies
 
-To run this project, a current version of Python 3 as well as Rustlang are needed. For instructions, see 
+To run this project, a current version of Python 3 as well as Rust are needed. For instructions, see 
 
 https://wiki.python.org/moin/BeginnersGuide/Download  
 https://www.rust-lang.org/tools/install
@@ -10,14 +10,13 @@ https://www.rust-lang.org/tools/install
 To install, first clone this repository and cd into it:
 
 ```bash
-git clone git+https://github.com/thatGuySpectre/SciCom22
+git clone https://github.com/thatGuySpectre/SciCom22
 cd SciCom22
 ```
 
 It is recommended to use a virtual python environment:
 
 ```bash
-pip install venv
 python3 -m venv venv/
 source venv/bin/activate
 ```
@@ -30,7 +29,7 @@ poetry install
 pip install .
 ```
 
-You can now import the module `scicom` in python files within the venv, or call default examples using `python3 -m scicom`
+You can now import the module `scicom` in python files within the venv, or call default examples in /tests directly.
 
 # Usage
 
